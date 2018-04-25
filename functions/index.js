@@ -7,6 +7,7 @@ admin.initializeApp(functions.config().firebase);
 
 const setGroupFile=require("./endpoints/setGroup.js");
 const setUserFile=require("./endpoints/setUser.js");
+const joinGroupFile=require("./endpoints/joinGroup.js");
 // Take the text parameter passed to this HTTP endpoint and insert it into the
 // Realtime Database under the path /messages/:pushId/original
 exports.addMessage = functions.https.onRequest((req, res) => {
@@ -68,6 +69,16 @@ exports.setMatch = functions.https.onRequest((req, res) => {
     var email=req.query.email;
    
     setUserFile.setUser(req,res,admin,email);
+
+  });
+
+  exports.joinGroup = functions.https.onRequest((req, res) => {
+    // Grab the text parameter.
+    var email=req.query.email;
+    var idGroup=req.query.idGroup;
+    var groupName=req.query.groupName;
+
+    joinGroupFile.joinGroup(req,res,admin,email,idGroup, groupName);
 
   });
 
