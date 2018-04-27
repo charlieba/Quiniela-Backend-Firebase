@@ -27,6 +27,7 @@ module.exports={
                         groupNameExists(groupName,ref_db_groups,(response)=>{
                             if(response!==0){
                                  var groupObject = ref_db_groups.child(idGroup+"/members");
+                                 res.end("{\"errror\":\"Group Name does not exits\"}");
                             }else{
                                 res.end("{\"errror\":\"Group Name does not exits\"}");
                             }
@@ -62,10 +63,14 @@ function userExists(email,ref_db,callback){
 
 function groupNameExists(groupName,ref_db,callback){
     var counter=0;
-    ref_db.orderByChild("groupName").equalTo(groupName).once("child_added", (snapshot)=>{
+    ref_db.orderByChild("groupName").equalTo(groupName).once("value", (snapshot)=>{
         counter=snapshot.numChildren(); 
+        console.log(snapshot.val().groupName);
         callback(snapshot.key);
-    });
+    }, function (errorObject) {
+        console.log("The read failed: " + errorObject.code);
+        callback(0);
+      });
 }
 
 function keyGroupsExists(groupKey,ref_db,callback){
