@@ -18,6 +18,7 @@ module.exports={
                                 groupObject.push({
                                     "email": email
                                 });
+                                res.end("{\"response\":\""+email+" added\"}");
                             }else{
                                 res.end("{\"errror\":\"Group ID does not exits\"}");
                             }
@@ -39,7 +40,6 @@ module.exports={
                       key = insertGroup.key;
                       response=response+1;
                       res.end("{\"userID\":\""+key+"\"}");*/
-                      res.end("{\"errror\":\"User already exits\"}");
 
                   }else{
                     res.end("{\"errror\":\"User not exits\"}");
@@ -71,13 +71,7 @@ function groupNameExists(groupName,ref_db,callback){
 function keyGroupsExists(groupKey,ref_db,callback){
     var counter=0;
     ref_db.orderByKey().equalTo(groupKey).once("value", (snapshot)=>{
-        if (!snapshot.exists()) {
-            console.log("entra aqui esta onda");
-        }
-        console.log("entra aqui esta onda");
-        console.log("llave "+snapshot.key);
         counter=snapshot.numChildren(); 
-        console.log("numero "+counter);
         callback(counter);
     }, function (errorObject) {
         console.log("The read failed: " + errorObject.code);
