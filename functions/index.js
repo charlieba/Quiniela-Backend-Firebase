@@ -56,7 +56,7 @@ exports.setMatch = functions.https.onRequest((req, res) => {
 
   exports.setGroup = functions.https.onRequest((req, res) => {
     // Grab the text parameter.
-    var userId=req.query.userId;
+    var userId=req.query.userAdmin;
     var groupName=req.query.groupName;
     var tournamentId=req.query.tournamentId;
    
