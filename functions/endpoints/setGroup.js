@@ -2,6 +2,7 @@ module.exports={
     setGroup: function(req,res,admin,userId,groupName,tournamentId){
         var ref_db = admin.database().ref('/groups');
         var ref_db_users = admin.database().ref('/users');
+        var ref_db_groupsByMembers=admin.database().ref('/groupsByMembers');
         res.set('Content-Type', 'application/json');
         try {
           userExists(userId,ref_db_users,(response)=>{
@@ -19,12 +20,13 @@ module.exports={
                         var insertGroup = ref_db.push(data);
                         key = insertGroup.key;
                         response=response+1;
-    
-                        var groupObject = ref_db.child(key+"/members");
-                        groupObject.push({
-                          "email": userId
+                        var path=groupName;
+                        //var groupObject = ref_db.child(key+"/members");
+                        data = {}; 
+                        userId[path] = true; 
+                        ref_db_groupsByMembers.update({
+                          userId
                         });
-    
                         res.end("{\"groupId\":\""+key+"\",\"countGroups\":\""+response+"\"}");
                     }else{
                       res.end("{\"errror\":\"Duplicated groupName\"}");
