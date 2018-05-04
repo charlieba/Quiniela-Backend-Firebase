@@ -9,6 +9,7 @@ const setGroupFile=require("./endpoints/setGroup.js");
 const setUserFile=require("./endpoints/setUser.js");
 const joinGroupFile=require("./endpoints/joinGroup.js");
 const getGroupsByUserFile=require("./endpoints/getGroupsByUser.js");
+const getMembersByGroupFile=require("./endpoints/getMembersByGroup.js");
 // Take the text parameter passed to this HTTP endpoint and insert it into the
 // Realtime Database under the path /messages/:pushId/original
 exports.addMessage = functions.https.onRequest((req, res) => {
@@ -89,6 +90,14 @@ exports.setMatch = functions.https.onRequest((req, res) => {
     var tournamentId=req.query.tournamentId;
 
     getGroupsByUserFile.getGroupsByUser(req,res,admin,email,tournamentId);
+
+  });
+
+  exports.getMembersByGroup = functions.https.onRequest((req, res) => {
+    // Grab the text parameter.
+    var groupName=req.query.groupName;
+
+    getMembersByGroupFile.getMembersByGroup(req,res,admin,groupName);
 
   });
 
