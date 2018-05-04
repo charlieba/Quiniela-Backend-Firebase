@@ -22,10 +22,9 @@ module.exports={
                         response=response+1;
                         var path=groupName;
                         //var groupObject = ref_db.child(key+"/members");
-                        data = {}; 
-                        userId[path] = true; 
-                        ref_db_groupsByMembers.update({
-                          userId
+                        ref_db_groupsByMembers.push({
+                          email: userId,
+                          groupName: groupName
                         });
                         res.end("{\"groupId\":\""+key+"\",\"countGroups\":\""+response+"\"}");
                     }else{

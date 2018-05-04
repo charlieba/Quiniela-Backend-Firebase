@@ -6,62 +6,32 @@ module.exports={
 
             try {
                 userExists(email,ref_db_users,(response)=>{
-
                   var key="";
                   if(response!==0){
-                    
-                    if(idGroup!==undefined){
-                        keyGroupsExists(idGroup,ref_db_groups,(response)=>{
-                            if(response!==0){
-                                var groupObject = ref_db_groups.child(idGroup+"/members");
-                                var ref_db_members = admin.database().ref('/groups/'+idGroup+"members");
-
-                                userExistsInGroup(email,ref_db_members,(response)=>{
-                                    if(response!==0){
-                                        groupObject.push({
-                                            "email": email
-                                        },(errorObject)=>{ 
-                                            res.end("{\"response\":\""+errorObject.code+" added\"}");
-                                        });
-                                        res.end("{\"response\":\""+email+" added\"}");
-                                    }else{
-                                        res.end("{\"errror\":\"User already exits in this group\"}");
-                                    }
-                                });
-                            }else{
-                                res.end("{\"errror\":\"Group ID does not exits\"}");
-                            }
-                        });    
-                    }else if(groupName!==undefined){
+                    if(groupName!==undefined){
                         groupNameExists(groupName,ref_db_groups,(response)=>{
                             if(response!==0){
-                                getKeyOfgroupName(groupName,ref_db_groups,(response)=>{
-                                    if(response!==undefined){
-                                        var groupObject = ref_db_groups.child(response+"/members");
-                                        var ref_db_members = admin.database().ref('/groups/'+response+"/members");
-                                        console.log('/groups/'+response+"/members");
-                                        userExistsInGroup(email,ref_db_members,(response)=>{
-                                            if(response===0){
-                                                groupObject.push({
-                                                    "email": email
-                                                }, (errorObject)=>{ 
-                                                    res.end("{\"response\":\""+errorObject.code+" added\"}");
-                                                });
-                                                res.end("{\"response\":\""+email+" added\"}");
-                                            }else{
-                                                res.end("{\"errror\":\"User already exits in this group\"}");
-                                            }
-                                        });
-                                    }else{
-                                        res.end("{\"errror\":\"Group Name does not exits\"}");
-                                    }
-                                });
-
+                                    var ref_db_membersByGroup = admin.database().ref('/groupsByMembers'); 
+                                    userExistsInGroup(email,groupName,ref_db_membersByGroup,(response)=>{
+                                        if(response===0){
+                                            ref_db_membersByGroup.push({
+                                                email: email,
+                                                groupName: groupName
+                                              }, (errorObject)=>{ 
+                                                res.end("{\"response\":\""+errorObject+" added\"}");
+                                            });
+                                            res.end("{\"response\":\""+email+" added to "+groupName+" \"}");
+                                        }else{
+                                            res.end("{\"errror\":\"User already exits in this group\"}");
+                                        }
+                                    });
                             }else{
                                 res.end("{\"errror\":\"Group Name does not exits\"}");
                             }
 
                         });
+                    }else{
+                        res.end("{\"errror\":\"Missing Parameter\"}");
                     }
 
                   }else{
@@ -83,27 +53,6 @@ function userExists(email,ref_db,callback){
     });
   }
 
-function getKeyOfgroupName(groupName,ref_db,callback){
-    var counter=0;
-    ref_db.orderByChild("groupName").equalTo(groupName).once("child_added", (snapshot)=>{
-        callback(snapshot.key);
-    },(errorObject)=>{
-        console.log("The read failed: " + errorObject.code);
-        callback(undefined);
-      });
-
-}
-
-function keyGroupsExists(groupKey,ref_db,callback){
-    var counter=0;
-    ref_db.orderByKey().equalTo(groupKey).once("value", (snapshot)=>{
-        counter=snapshot.numChildren(); 
-        callback(counter);
-    },(errorObject)=>{
-        console.log("The read failed: " + errorObject.code);
-        callback(0);
-      });
-}
 function groupNameExists(groupName,ref_db,callback){
     var counter=0;
     ref_db.orderByChild("groupName").equalTo(groupName).once("value", (snapshot)=>{
@@ -114,13 +63,15 @@ function groupNameExists(groupName,ref_db,callback){
         callback(0);
       });
 }
-
-function userExistsInGroup(email,ref_db,callback){
+function userExistsInGroup(email, groupName, ref_db,callback){
     var counter=0;
     ref_db.orderByChild("email").equalTo(email).once("value", (snapshot)=>{
-        counter=snapshot.numChildren(); 
-        console.log(counter);
-        callback(counter);
+        snapshot.forEach((childSnapshot)=>{
+        if(childSnapshot.val().groupName===groupName){
+          counter=1;
+        }
+      });
+      callback(counter);
     },(errorObject)=>{
         console.log("The read failed: " + errorObject.code);
         callback(0);
