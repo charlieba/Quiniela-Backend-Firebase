@@ -101,3 +101,20 @@ exports.setMatch = functions.https.onRequest((req, res) => {
 
   });
 
+  exports.getUserByEmail = functions.https.onRequest((req, res) => {
+    // Grab the text parameter.
+    var email=req.query.email;
+
+      admin.auth().getUserByEmail(email)
+      .then(function(userRecord) {
+        // See the UserRecord reference doc for the contents of userRecord.
+        console.log("Successfully fetched user data:", userRecord.toJSON());
+      })
+      .catch(function(error) {
+        console.log("Error fetching user data:", error);
+      });
+      res.set('Content-Type', 'application/json');
+      return res.send("[{\"successful\": true}]");
+
+  });
+
