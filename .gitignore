@@ -19,3 +19,4 @@ firebase.json
 .eslintrc.json
 package-lock.json
 package.json
+serviceAccountKey.json
