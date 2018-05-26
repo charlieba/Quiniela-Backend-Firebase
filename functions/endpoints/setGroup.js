@@ -1,7 +1,6 @@
 module.exports={
     setGroup: function(req,res,admin,userId,groupName,tournamentId){
       res.set('Content-Type', 'application/json');
-      console.log(groupName);
        try {
         if (/\s/.test(groupName) || groupName.length > 8 ) {
           printResponse(res,-1,"");
