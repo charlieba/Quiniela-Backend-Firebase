@@ -3,7 +3,11 @@ const functions = require('firebase-functions');
 
 // The Firebase Admin SDK to access the Firebase Realtime Database.
 const admin = require('firebase-admin');
-admin.initializeApp(functions.config().firebase);
+var serviceAccount = require("./serviceAccountKey.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://quiniela-app.firebaseio.com'
+});
 
 const setGroupFile=require("./endpoints/setGroup.js");
 const setUserFile=require("./endpoints/setUser.js");

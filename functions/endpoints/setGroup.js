@@ -1,14 +1,15 @@
 module.exports={
     setGroup: function(req,res,admin,userId,groupName,tournamentId){
-        var ref_db = admin.database().ref('/groups');
-        var ref_db_users = admin.database().ref('/users');
-        var ref_db_groupsByMembers=admin.database().ref('/groupsByMembers');
-        res.set('Content-Type', 'application/json');
-        try {
-          userExists(userId,ref_db_users,(response)=>{
+      res.set('Content-Type', 'application/json');
+      console.log(groupName);
+       try {
+        if (/\s/.test(groupName) || groupName.length > 8 ) {
+          printResponse(res,-1,"");
+        }else{
+          userExists(admin,userId,(response)=>{
             if(response!==0){
+              var ref_db = admin.database().ref('/groups');
               getAmountOfGroupsByUser(userId,ref_db,(response)=>{
-                var key="";
                 if(response<5){
                   getAmountOfGroupsWithTheSameName(groupName,userId,ref_db,(counterGroupsWithSameName)=>{
                     if(counterGroupsWithSameName===0){
@@ -22,23 +23,28 @@ module.exports={
                         response=response+1;
                         var path=groupName;
                         //var groupObject = ref_db.child(key+"/members");
+                        var ref_db_groupsByMembers=admin.database().ref('/groupsByMembers');
                         ref_db_groupsByMembers.push({
                           email: userId,
                           groupName: groupName
                         });
-                        res.end("{\"groupId\":\""+key+"\",\"countGroups\":\""+response+"\"}");
+                        //res.end("{\"groupId\":\""+key+"\",\"countGroups\":\""+response+"\"}");
+                        printResponse(res,1,key);
                     }else{
-                      res.end("{\"errror\":\"Duplicated groupName\"}");
+                      //res.end("{\"errror\":\"Duplicated groupName\"}");
+                      printResponse(res,-2,"");
                     }
                   }); 
                 }else{
-                  res.end("{\"errror\":\"User exceeded limit of groups\"}");
+                  //res.end("{\"errror\":\"User exceeded limit of groups\"}");
+                  printResponse(res,-3,"");
                 }
               });
             }else{
               res.end("{\"errror\":\"User does not exits\"}");
             }
-          });       
+          });   
+        }    
         } catch (error) {
            res.end("{\"error\":\""+error+"\"}");
         }
@@ -69,10 +75,20 @@ function getAmountOfGroupsByUser(userId,ref_db,callback){
   }
 
   //Verifica si el usuario administrador existe
-  function userExists(email,ref_db,callback){
-    var counter=0;
-    ref_db.orderByChild("email").equalTo(email).once("value", (snapshot)=>{
-      counter=snapshot.numChildren(); 
-      callback(counter);
+  function userExists(admin, email, callback){
+    admin.auth().getUserByEmail(email)
+    .then(function(userRecord) {
+        callback(1);
+    })
+    .catch(function(error) {
+      if(error.code=="auth/invalid-email"){
+        callback(0);
+      }else{
+        res.end("{\"error\":\""+error+"\"}");
+      }
     });
-  }
+}
+
+function printResponse(res,response, code){
+  res.end("{\"response\":\""+response+"\",\"code\":\""+code+"\"}");
+}

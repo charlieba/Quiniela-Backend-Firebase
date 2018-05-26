@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "62171822999",
+    "firebase_url": "https://quiniela-app.firebaseio.com",
+    "project_id": "quiniela-app",
+    "storage_bucket": "quiniela-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:62171822999:android:2df0a2df3345354d",
+        "android_client_info": {
+          "package_name": "com.fbloginwithfirebaseexample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "62171822999-pe15l4saafn2asp1ti03hfmsdtj3v3va.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "62171822999-pe15l4saafn2asp1ti03hfmsdtj3v3va.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKjgyXKRabhesn55EU7bg68XC6Vv3o6L8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
