@@ -105,7 +105,7 @@ exports.setMatch = functions.https.onRequest((req, res) => {
 
   });
 
-  exports.getUserByEmail = functions.https.onRequest((req, res) => {
+  /*exports.getUserByEmail = functions.https.onRequest((req, res) => {
     // Grab the text parameter.
     var email=req.query.email;
 
@@ -120,5 +120,5 @@ exports.setMatch = functions.https.onRequest((req, res) => {
       res.set('Content-Type', 'application/json');
       return res.send("[{\"successful\": true}]");
 
-  });
+  });*/
 

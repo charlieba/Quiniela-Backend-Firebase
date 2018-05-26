@@ -76,15 +76,16 @@ function getAmountOfGroupsByUser(userId,ref_db,callback){
   //Verifica si el usuario administrador existe
   function userExists(admin, email, callback){
     admin.auth().getUserByEmail(email)
-    .then(function(userRecord) {
-        callback(1);
+    .then((userRecord)=>{
+        return callback(1);
     })
-    .catch(function(error) {
-      if(error.code=="auth/invalid-email"){
-        callback(0);
+    .catch((error)=>{
+      if(error.code==="auth/invalid-email"){
+        return callback(0);
       }else{
         res.end("{\"error\":\""+error+"\"}");
       }
+      return callback(0);
     });
 }
 
