@@ -1,14 +1,12 @@
 module.exports={
     joinGroup: function(req,res,admin,email,idGroup, groupName){
-        var ref_db_groups = admin.database().ref('/groups');
-        var ref_db_users = admin.database().ref('/users');
         res.set('Content-Type', 'application/json');
-
             try {
-                userExists(email,ref_db_users,(response)=>{
+                userExists(email,admin,(response)=>{
                   var key="";
                   if(response!==0){
                     if(groupName!==undefined){
+                        var ref_db_groups = admin.database().ref('/groups');
                         groupNameExists(groupName,ref_db_groups,(response)=>{
                             if(response!==0){
                                     var ref_db_membersByGroup = admin.database().ref('/groupsByMembers'); 
@@ -20,13 +18,16 @@ module.exports={
                                               }, (errorObject)=>{ 
                                                 res.end("{\"response\":\""+errorObject+" added\"}");
                                             });
-                                            res.end("{\"response\":\""+email+" added to "+groupName+" \"}");
+                                            //res.end("{\"response\":\""+email+" added to "+groupName+" \"}");
+                                            printResponse(res,"",1);
                                         }else{
-                                            res.end("{\"errror\":\"User already exits in this group\"}");
+                                            printResponse(res,"", -3);
+                                            //res.end("{\"errror\":\"User already exits in this group\"}");
                                         }
                                     });
                             }else{
-                                res.end("{\"errror\":\"Group Name does not exits\"}");
+                                printResponse(res,"",-1);
+                                //res.end("{\"errror\":\"Group Name does not exits\"}");
                             }
 
                         });
@@ -35,7 +36,8 @@ module.exports={
                     }
 
                   }else{
-                    res.end("{\"errror\":\"User not exits\"}");
+                    //res.end("{\"errror\":\"User not exits\"}");
+                    printResponse(res,"",-2);
                   }
                 });
               } catch (error) {
@@ -45,13 +47,20 @@ module.exports={
     }
 }
 
-function userExists(email,ref_db,callback){
-    var counter=0;
-    ref_db.orderByChild("email").equalTo(email).once("value", (snapshot)=>{
-      counter=snapshot.numChildren(); 
-      callback(counter);
+function userExists(email, admin, callback){
+    admin.auth().getUserByEmail(email)
+    .then((userRecord)=>{
+        return callback(1);
+    })
+    .catch((error)=>{
+      if(error.code==="auth/invalid-email"){
+        return callback(0);
+      }else{
+        res.end("{\"error\":\""+error+"\"}");
+      }
+      return callback(0);
     });
-  }
+}
 
 function groupNameExists(groupName,ref_db,callback){
     var counter=0;
@@ -77,4 +86,7 @@ function userExistsInGroup(email, groupName, ref_db,callback){
         callback(0);
       });
 }
+function printResponse(res,response, code){
+    res.end("{\"response\":\""+response+"\",\"code\":\""+code+"\"}");
+  }
   
