@@ -3,7 +3,7 @@ module.exports={
         var ref_db = admin.database().ref('/groupsByMembers');
         res.set('Content-Type', 'application/json');
             try {
-                getUsersByGroup(groupName,ref_db,(response)=>{
+                getUsersByGroup(admin,groupName,ref_db,(response)=>{
                     response=JSON.stringify(response);
                     res.end("{\"members\":"+response.toString()+"}");
                 });
@@ -14,15 +14,37 @@ module.exports={
     }
 }
 
-function getUsersByGroup(groupName, ref_db,callback){
+function getUsersByGroup(admin,groupName, ref_db,callback){
   var groups=[];
   ref_db.orderByChild("groupName").equalTo(groupName).once("value", (snapshot)=>{
       snapshot.forEach((childSnapshot)=>{
-        groups.push(childSnapshot.val().email);
+
+        //groups.push(childSnapshot.val().email);
+
+        //Obtener informacion del usuario
+        getInfoUsers(admin,childSnapshot.val().email,(response)=>{
+            groups.push(response);
+            //console.log(response);
+        });
     });
-    callback(groups);
+    return callback(groups);
   },(errorObject)=>{
       console.log("The read failed: " + errorObject.code);
       callback(0);
+    });
+}
+
+function getInfoUsers(admin, email, callback){
+    admin.auth().getUserByEmail(email)
+    .then((userRecord)=>{
+        return callback({"rank":1,"id":userRecord.uid,"name":userRecord.displayName,"score":12});
+    })
+    .catch((error)=>{
+      if(error.code==="auth/invalid-email"){
+        return callback({});
+      }else{
+        res.end("{\"error\":\""+error+"\"}");
+      }
+      return callback({});
     });
 }
